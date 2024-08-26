@@ -1,17 +1,30 @@
-import { Body, Controller, HttpException, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
+import { LocalGuard } from './guards/local.guard';
+import { Request } from 'express';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { SignupDto } from './dto/signup.dto';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-    constructor(private authService: AuthService){}
+  @Post('signup')
+  async signup(@Body() signupDto: SignupDto) {
+    return this.authService.signup(signupDto);
+  }
 
-    @Post('login') 
-    login(@Body() authpayload:AuthPayloadDto) {
-        const user = this.authService.validateUser(authpayload);
-        return user;
-        // if(!user) throw new HttpException('Invalid Credentials', 401);
-        // return user;
-    }
+  @Post('login')
+  @UseGuards(LocalGuard)
+  login(@Body() authPayload: AuthPayloadDto) {
+    return this.authService.validateUser(authPayload);
+  }
+
+  @Get('status')
+  @UseGuards(JwtAuthGuard)
+  status(@Req() req: Request) {
+    console.log('Mahmud Bakale');
+    console.log(req.user);
+  }
 }
