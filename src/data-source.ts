@@ -1,14 +1,18 @@
 import { DataSource } from 'typeorm';
-import { User } from './entities/user.entity'; // your entity
+import { User } from './entities/user.entity';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'root',
-  database: 'wash_n_wax',
+  type: 'postgres', // You can cast this to the appropriate type
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT, 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   entities: [User],
   migrations: ['src/migrations/*.ts'],
-  synchronize: false, // Don't use `synchronize` in production
+  synchronize: true, // Be cautious with this in production
 });

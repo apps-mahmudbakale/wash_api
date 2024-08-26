@@ -12,43 +12,54 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>, // Inject the UserRepository
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async signup(signupDto: SignupDto): Promise<string> {
     const { name, email, password } = signupDto;
 
-    // Check if the email already exists
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save the new user
     const newUser = this.userRepository.create({
       name,
       email,
       password: hashedPassword,
     });
+
     await this.userRepository.save(newUser);
 
-    // Generate and return a JWT token
     const payload = { id: newUser.id, name: newUser.name, email: newUser.email };
     return this.jwtService.sign(payload);
   }
 
   async validateUser({ email, password }: AuthPayloadDto): Promise<string | null> {
+    // Debugging: Log the received email and password
+    console.log('Received Email:', email);
+    console.log('Received Password:', password);
+
     const user = await this.userRepository.findOne({ where: { email } });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Generate JWT without password
-      const payload = { id: user.id, name: user.name, email: user.email };
-      return this.jwtService.sign(payload);
+    if (!user) {
+      console.log('User not found'); // Debugging
+      throw new UnauthorizedException('Invalid email or password');
     }
 
-    throw new UnauthorizedException('Invalid email or password');
+    // Debugging: Log the stored hashed password
+    console.log('Stored Hashed Password:', user.password);
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      console.log('Password does not match'); // Debugging
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    // Generate JWT
+    const payload = { id: user.id, name: user.name, email: user.email };
+    return this.jwtService.sign(payload);
   }
 }
