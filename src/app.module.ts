@@ -18,6 +18,8 @@ dotenv.config();
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [User],
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
+      synchronize: true,
     }),
     AuthModule,
   ],
