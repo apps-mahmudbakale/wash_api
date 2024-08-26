@@ -15,4 +15,5 @@ export const AppDataSource = new DataSource({
   entities: [User],
   migrations: ['src/migrations/*.ts'],
   synchronize: true, // Be cautious with this in production
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
 });
