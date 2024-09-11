@@ -8,11 +8,18 @@ export class User {
   @Column()
   name: string;
 
-  @Column({
-    unique: true
-  })
+  @Column()
   email: string;
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true })
+  otpExpires: Date;
+
+  @Column({ nullable: true })
+  refreshToken: string;
 }

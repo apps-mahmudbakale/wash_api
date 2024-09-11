@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './entities/user.entity';
 
 import * as dotenv from 'dotenv';
+import { ConfigModule } from "@nestjs/config";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -18,7 +19,7 @@ dotenv.config();
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [User],
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
+      // ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
     }),
     AuthModule,
   ],
