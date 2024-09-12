@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Req, UseGuards,BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { SignupDto } from './dto/signup.dto';
+import { use } from 'passport';
 
 @Controller('auth')
 export class AuthController {
@@ -40,9 +41,19 @@ export class AuthController {
 
   @Get('status')
   @UseGuards(JwtAuthGuard)
-  status(@Req() req: Request) {
-    console.log(req.user);
-    return req.user;
+  async status(@Req() req: any) {
+    // req.user contains the payload from the JWT (likely contains userId or email)
+    const userId = req.user['id']; // Assuming your JWT contains the userId
+
+    // Fetch the full user record from the database using the userId
+    const user = await this.authService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Return the full user record
+    return user;
   }
 
   // NEW: Route to update user location
@@ -52,6 +63,7 @@ export class AuthController {
     @Req() req: Request,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number,
+    @Body('address') address: string,
   ) {
     const userId = req.user['id']; // Extract the userId from the JWT token payload
 
@@ -60,7 +72,7 @@ export class AuthController {
     }
 
     // Call the service method to update location
-    await this.authService.saveLocation(userId, latitude, longitude);
+    await this.authService.saveLocation(userId, latitude, longitude, address);
 
     return { message: 'Location updated successfully' };
   }

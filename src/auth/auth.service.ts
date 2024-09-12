@@ -48,12 +48,18 @@ export class AuthService {
     await transporter.sendMail(mailOptions);
   }
 
+  async findById(id: number): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+
   // User signup with OTP
   async signup(signupDto: SignupDto): Promise<{ id: number; name: string; email: string }> {
     const { name, email, password } = signupDto;
 
     // Check if the user already exists
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
@@ -152,9 +158,6 @@ export class AuthService {
       id: user.id,
       name: user.name,
       email: user.email,
-      location: user.address,
-      lat: user.lat,
-      long: user.long,
     };
     const token = this.jwtService.sign(payload);
 
@@ -165,6 +168,7 @@ export class AuthService {
     userId: number,
     latitude: number,
     longitude: number,
+    address: string
   ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -175,6 +179,7 @@ export class AuthService {
     // Update user's latitude and longitude
     user.lat = latitude;
     user.long = longitude;
+    user.address = address;
 
     // Save the updated user location to the database
     await this.userRepository.save(user);
