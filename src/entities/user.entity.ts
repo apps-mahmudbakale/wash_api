@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -22,4 +21,16 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  lat: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  long: number;
+
+  @Column({ type: 'varchar', length: 50, default: 'user' })
+  role: string;
+
+  @Column({ type: 'text', nullable: true })
+  address: string;
 }
