@@ -65,7 +65,7 @@ export class AuthController {
     @Body('longitude') longitude: number,
     @Body('address') address: string,
   ) {
-    const userId = req.user['id']; // Extract the userId from the JWT token payload
+    const userId = req.user['id'];
 
     if (!userId) {
       throw new UnauthorizedException('Invalid token');
@@ -75,5 +75,13 @@ export class AuthController {
     await this.authService.saveLocation(userId, latitude, longitude, address);
 
     return { message: 'Location updated successfully' };
+  }
+  // Admin Login (email and password)
+  @Post('admin/login')
+  async adminLogin(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ) {
+    return await this.authService.adminLogin(email, password);
   }
 }

@@ -1,4 +1,11 @@
-import { Injectable, ConflictException, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException
+} from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -183,5 +190,23 @@ export class AuthService {
 
     // Save the updated user location to the database
     await this.userRepository.save(user);
+  }
+  // Admin login logic
+  async adminLogin(email: string, password: string): Promise<{ token: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user || user.role !== 'admin') {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = { id: user.id, name: user.name, email: user.email, role: user.role };
+    const token = this.jwtService.sign(payload);
+
+    return { token };
   }
 }
