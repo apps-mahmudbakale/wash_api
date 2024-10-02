@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { User } from './entities/user.entity';
+import { CarWashers } from './entities/car-washers.entity';
 
 import * as dotenv from 'dotenv';
-import { ConfigModule } from "@nestjs/config";
+import { CarWashersModule } from './car-washers/car-washers.module';
+import { PackagesModule } from './packages/packages.module';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -18,11 +20,13 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User],
+      entities: [User, CarWashers],
       synchronize: true,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
     }),
     AuthModule,
+    CarWashersModule,
+    PackagesModule,
   ],
 })
 export class AppModule {}
