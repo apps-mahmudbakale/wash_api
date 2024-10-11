@@ -8,8 +8,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:5174',
-      'http://localhost:5175',
-      'https://mercury-frontend.vercel.app/',
+      'https://washweb.vercel.app/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
