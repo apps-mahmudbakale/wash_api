@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class CarWashers {
@@ -9,32 +9,26 @@ export class CarWashers {
   fullName: string;
 
   @Column()
-  phoneNumber: string;
+  phone: string;
 
   @Column()
-  email: string;
+  bankName: string;
+
+  @Column()
+  accountNumber: string;
 
   @Column({ nullable: true })
-  kycDocument: string; // Path to uploaded KYC documents (NIN, BVN)
+  bvn?: string;
 
   @Column({ nullable: true })
-  profilePicture: string; // Path to the uploaded profile picture
-
-  @Column()
-  bvn: string; // Bank Verification Number
-
-  @Column()
-  nin: string; // National Identification Number
-
-  @Column()
-  bankName: string; // Bank Name
-
-  @Column()
-  bankAccountNumber: string; // Bank Account Number
+  nin?: string;
 
   @Column({ default: false })
   isKYCVerified: boolean;
 
-  @Column({ default: false })
-  isActive: boolean;
+  @Column({ nullable: true })
+  profilePicture?: string;
+
+  @Column({ nullable: true })
+  kycDocument?: string;
 }

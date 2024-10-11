@@ -22,7 +22,7 @@ dotenv.config();
       database: process.env.DB_DATABASE,
       entities: [User, CarWashers],
       synchronize: true,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
     AuthModule,
     CarWashersModule,

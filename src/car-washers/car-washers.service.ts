@@ -11,8 +11,18 @@ export class CarWashersService {
     private carWasherRepository: Repository<CarWashers>,
   ) {}
 
-  createCarWasher(createCarWasherDto: CreateCarWasherDto): Promise<CarWashers> {
+  // Modified method to handle profile picture upload
+  async createCarWasher(
+    createCarWasherDto: CreateCarWasherDto,
+    profilePicture: Express.Multer.File,
+  ): Promise<CarWashers> {
     const carWasher = this.carWasherRepository.create(createCarWasherDto);
+
+    // Assign the profile picture file path if it exists
+    if (profilePicture) {
+      carWasher.profilePicture = `/uploads/profile-pictures/${profilePicture.filename}`;
+    }
+
     return this.carWasherRepository.save(carWasher);
   }
 
@@ -24,7 +34,10 @@ export class CarWashersService {
     return this.carWasherRepository.findOneBy({ id });
   }
 
-  async updateCarWasher(id: number, updateData: Partial<CreateCarWasherDto>): Promise<CarWashers> {
+  async updateCarWasher(
+    id: number,
+    updateData: Partial<CreateCarWasherDto>,
+  ): Promise<CarWashers> {
     await this.carWasherRepository.update(id, updateData);
     return this.findOne(id);
   }
@@ -36,5 +49,18 @@ export class CarWashersService {
   async verifyKYC(id: number): Promise<CarWashers> {
     await this.carWasherRepository.update(id, { isKYCVerified: true });
     return this.findOne(id);
+  }
+
+  // KYC document upload handling (optional)
+  async uploadKYCDocument(
+    carWasherId: number,
+    kycDocument: Express.Multer.File,
+  ): Promise<CarWashers> {
+    const carWasher = await this.findOne(carWasherId);
+    if (carWasher) {
+      carWasher.kycDocument = `/uploads/kyc-documents/${kycDocument.filename}`;
+      return this.carWasherRepository.save(carWasher);
+    }
+    throw new Error('Car washer not found');
   }
 }

@@ -18,40 +18,10 @@ import { diskStorage } from 'multer';
 export class CarWashersController {
   constructor(private readonly carWasherService: CarWashersService) {}
 
+  // Creating a car washer with file uploads for KYC and profile picture
   @Post('create')
-  create(@Body() createCarWasherDto: CreateCarWasherDto) {
-    return this.carWasherService.createCarWasher(createCarWasherDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.carWasherService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.carWasherService.findOne(id);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: number, @Body() updateData: Partial<CreateCarWasherDto>) {
-    return this.carWasherService.updateCarWasher(id, updateData);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.carWasherService.removeCarWasher(id);
-  }
-
-  @Put('verify-kyc/:id')
-  verifyKYC(@Param('id') id: number) {
-    return this.carWasherService.verifyKYC(id);
-  }
-
-  // Profile picture upload
-  @Post('upload-profile-picture')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('profilePicture', {
       storage: diskStorage({
         destination: './uploads/profile-pictures',
         filename: (req, file, cb) => {
@@ -69,14 +39,49 @@ export class CarWashersController {
       }),
     }),
   )
-  uploadProfilePicture(@UploadedFile() file: Express.Multer.File) {
+  async create(
+    @Body() createCarWasherDto: CreateCarWasherDto,
+    @UploadedFile() profilePicture: Express.Multer.File,
+  ) {
+    const washer = await this.carWasherService.createCarWasher(
+      createCarWasherDto,
+      profilePicture,
+    );
     return {
-      message: 'Profile picture uploaded successfully',
-      filePath: `/uploads/profile-pictures/${file.filename}`,
+      message: 'Car washer created successfully',
+      washer,
     };
   }
 
-  // KYC document upload (e.g., BVN, NIN)
+  @Get()
+  findAll() {
+    return this.carWasherService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.carWasherService.findOne(id);
+  }
+
+  @Put(':id')
+  update(
+    @Param('id') id: number,
+    @Body() updateData: Partial<CreateCarWasherDto>,
+  ) {
+    return this.carWasherService.updateCarWasher(id, updateData);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+    return this.carWasherService.removeCarWasher(id);
+  }
+
+  @Put('verify-kyc/:id')
+  verifyKYC(@Param('id') id: number) {
+    return this.carWasherService.verifyKYC(id);
+  }
+
+  // Upload KYC document
   @Post('upload-kyc-document')
   @UseInterceptors(
     FileInterceptor('file', {
