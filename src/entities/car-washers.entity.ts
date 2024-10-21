@@ -31,4 +31,9 @@ export class CarWashers {
 
   @Column({ nullable: true })
   kycDocument?: string;
+  @Column('decimal', { precision: 10, scale: 8 }) // Adjust precision/scale as needed
+  latitude: number;
+
+  @Column('decimal', { precision: 11, scale: 8 }) // Adjust precision/scale as needed
+  longitude: number;
 }

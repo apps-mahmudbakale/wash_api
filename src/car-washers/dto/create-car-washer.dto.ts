@@ -1,6 +1,6 @@
 export class CreateCarWasherDto {
   fullName: string;
-  phoneNumber: string;
+  phone: string;
   email: string;
   profilePicture: string; // Profile picture upload
 
@@ -16,4 +16,7 @@ export class CreateCarWasherDto {
 
   isKYCVerified: boolean;
   isActive: boolean;
+
+  latitude: number;
+  longitude: number;
 }

@@ -7,6 +7,7 @@ import { CarWashers } from './entities/car-washers.entity';
 import * as dotenv from 'dotenv';
 import { CarWashersModule } from './car-washers/car-washers.module';
 import { PackagesModule } from './packages/packages.module';
+import { Package } from './entities/package.entity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -20,7 +21,7 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, CarWashers],
+      entities: [User, CarWashers, Package],
       synchronize: true,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
