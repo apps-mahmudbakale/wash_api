@@ -8,6 +8,8 @@ import * as dotenv from 'dotenv';
 import { CarWashersModule } from './car-washers/car-washers.module';
 import { PackagesModule } from './packages/packages.module';
 import { Package } from './entities/package.entity';
+import { GiftCardModule } from './gift-cards/gift-cards.module';
+import { GiftCard } from './entities/gift-card.entity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,13 +23,14 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, CarWashers, Package],
+      entities: [User, CarWashers, Package, GiftCard],
       synchronize: true,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
     AuthModule,
     CarWashersModule,
     PackagesModule,
+    GiftCardModule,
   ],
 })
 export class AppModule {}
