@@ -210,4 +210,23 @@ export class AuthService {
 
     return { token };
   }
+  async sendForgotPasswordOtp(email: string): Promise<{ message: string }> {
+    // Check if the email exists in the system
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('Email not found');
+    }
+
+    // Generate OTP (you might use a separate service or helper for this)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Example 6-digit OTP
+
+    // Save OTP to the user's record or a temporary store
+    user.otp = otp;
+    await this.userRepository.save(user);
+
+    // Send OTP to email (assuming you have an EmailService)
+    await this.sendOtpEmail(email, otp);
+
+    return { message: 'OTP sent successfully' };
+  }
 }
