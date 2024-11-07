@@ -218,8 +218,7 @@ export class AuthService {
     }
 
     // Generate OTP (you might use a separate service or helper for this)
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Example 6-digit OTP
-
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit OTP
     // Save OTP to the user's record or a temporary store
     user.otp = otp;
     await this.userRepository.save(user);
