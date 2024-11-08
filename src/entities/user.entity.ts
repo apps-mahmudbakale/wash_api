@@ -17,7 +17,7 @@ export class User {
   otp: string;
 
   @Column({ nullable: true })
-  otpExpires: Date;
+  otpExpires: number;
 
   @Column({ nullable: true })
   refreshToken: string;

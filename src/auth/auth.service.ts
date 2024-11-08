@@ -24,11 +24,9 @@ export class AuthService {
   ) {}
 
   // Helper to generate OTP and its expiration time
-  private generateOtp(): { otp: string; otpExpires: Date } {
-    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit OTP
-
-    const otpExpires = new Date();
-    otpExpires.setMinutes(otpExpires.getMinutes() + 10); // OTP expires in 10 minutes
+  private generateOtp(): { otp: string; otpExpires: number } {
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes in milliseconds
     return { otp, otpExpires };
   }
 
@@ -78,7 +76,6 @@ export class AuthService {
 
     // Generate OTP
     const { otp, otpExpires } = this.generateOtp();
-
     // Create new user with OTP
     const newUser = this.userRepository.create({
       name,
@@ -110,7 +107,7 @@ export class AuthService {
     // Generate a new OTP and update the user
     const { otp, otpExpires } = this.generateOtp();
     user.otp = otp;
-    user.otpExpires = otpExpires;
+    user.otpExpires = otpExpires; // Store as a timestam
 
     // Save updated OTP to the user
     await this.userRepository.save(user);
@@ -131,6 +128,7 @@ export class AuthService {
 
     // Check if the OTP matches and hasn't expired
     const currentTime = new Date();
+    // @ts-ignore
     if (user.otp !== otp || currentTime > user.otpExpires) {
       throw new BadRequestException('Invalid or expired OTP');
     }
@@ -158,19 +156,19 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Check if the OTP matches and hasn't expired
-    const currentTime = new Date();
+    // // Check if the OTP matches and hasn't expired
+    const currentTime = Date.now();
     if (user.otp !== otp || currentTime > user.otpExpires) {
       throw new BadRequestException('Invalid or expired OTP');
     }
-
-    // OTP is valid, clear OTP and expiration once verified
-    user.otp = null;
-    user.otpExpires = null;
-    await this.userRepository.save(user);
-
-    // Return success status for frontend verification
-    return { success: true, message: 'OTP verified successfully' };
+    //
+    // // OTP is valid, clear OTP and expiration once verified
+    // user.otp = null;
+    // user.otpExpires = null;
+    // await this.userRepository.save(user);
+    //
+    // // Return success status for frontend verification
+    return { success: false, message: 'OTP verified successfully' };
   }
 
   // Validate user login (via email/password)
