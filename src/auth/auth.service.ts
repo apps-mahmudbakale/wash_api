@@ -105,16 +105,16 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Generate a new OTP and update the user
-    const { otp, otpExpires } = this.generateOtp();
-    user.otp = otp;
-    user.otpExpires = otpExpires;
+      // Generate a new OTP and update the user
+      const { otp, otpExpires } = this.generateOtp();
+      user.otp = otp;
+      user.otpExpires = otpExpires;
 
-    // Save updated OTP to the user
-    await this.userRepository.save(user);
+      // Save updated OTP to the user
+      await this.userRepository.save(user);
 
-    // Send the OTP via email
-    await this.sendOtpEmail(user.email, otp);
+      // Send the OTP via email
+      await this.sendOtpEmail(user.email, otp);
 
     return { message: 'OTP resent successfully' };
   }
@@ -217,14 +217,16 @@ export class AuthService {
       throw new BadRequestException('Email not found');
     }
 
-    // Generate OTP (you might use a separate service or helper for this)
-    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit OTP
-    // Save OTP to the user's record or a temporary store
+    // Generate a new OTP and update the user
+    const { otp, otpExpires } = this.generateOtp();
     user.otp = otp;
+    user.otpExpires = otpExpires;
+
+    // Save updated OTP to the user
     await this.userRepository.save(user);
 
-    // Send OTP to email (assuming you have an EmailService)
-    await this.sendOtpEmail(email, otp);
+    // Send the OTP via email
+    await this.sendOtpEmail(user.email, otp);
 
     return { message: 'OTP sent successfully' };
   }
