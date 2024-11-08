@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
-  ForbiddenException
-} from "@nestjs/common";
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -60,7 +60,9 @@ export class AuthService {
   }
 
   // User signup with OTP
-  async signup(signupDto: SignupDto): Promise<{ id: number; name: string; email: string }> {
+  async signup(
+    signupDto: SignupDto,
+  ): Promise<{ id: number; name: string; email: string }> {
     const { name, email, password } = signupDto;
 
     // Check if the user already exists
@@ -105,16 +107,16 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-      // Generate a new OTP and update the user
-      const { otp, otpExpires } = this.generateOtp();
-      user.otp = otp;
-      user.otpExpires = otpExpires;
+    // Generate a new OTP and update the user
+    const { otp, otpExpires } = this.generateOtp();
+    user.otp = otp;
+    user.otpExpires = otpExpires;
 
-      // Save updated OTP to the user
-      await this.userRepository.save(user);
+    // Save updated OTP to the user
+    await this.userRepository.save(user);
 
-      // Send the OTP via email
-      await this.sendOtpEmail(user.email, otp);
+    // Send the OTP via email
+    await this.sendOtpEmail(user.email, otp);
 
     return { message: 'OTP resent successfully' };
   }
@@ -143,6 +145,32 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return { token };
+  }
+
+  // Verify OTP for forgot password
+  async verifyOtp2(
+    email: string,
+    otp: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if the OTP matches and hasn't expired
+    const currentTime = new Date();
+    if (user.otp !== otp || currentTime > user.otpExpires) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    // OTP is valid, clear OTP and expiration once verified
+    user.otp = null;
+    user.otpExpires = null;
+    await this.userRepository.save(user);
+
+    // Return success status for frontend verification
+    return { success: true, message: 'OTP verified successfully' };
   }
 
   // Validate user login (via email/password)
@@ -175,7 +203,7 @@ export class AuthService {
     userId: number,
     latitude: number,
     longitude: number,
-    address: string
+    address: string,
   ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -192,7 +220,10 @@ export class AuthService {
     await this.userRepository.save(user);
   }
   // Admin login logic
-  async adminLogin(email: string, password: string): Promise<{ token: string }> {
+  async adminLogin(
+    email: string,
+    password: string,
+  ): Promise<{ token: string }> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     console.log(user);
@@ -205,7 +236,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = { id: user.id, name: user.name, email: user.email, role: user.role };
+    const payload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
     const token = this.jwtService.sign(payload);
 
     return { token };

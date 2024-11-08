@@ -30,6 +30,14 @@ export class AuthController {
     return this.authService.verifyOtp(email, otp);
   }
 
+  @Post('verify-otp-forgot-password')
+  async verifyOtp2(@Body('email') email: string, @Body('otp') otp: string) {
+    if (!email || !otp) {
+      throw new BadRequestException('Email and OTP are required');
+    }
+    return this.authService.verifyOtp2(email, otp);
+  }
+
   @Post('resend-otp')
   async resendOtp(@Body('email') email: string) {
     return this.authService.resendOtp(email);
