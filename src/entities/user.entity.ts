@@ -16,7 +16,7 @@ export class User {
   @Column({ nullable: true })
   otp: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   otpExpires: number;
 
   @Column({ nullable: true })
