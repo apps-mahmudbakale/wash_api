@@ -54,6 +54,24 @@ export class AuthController {
     return this.authService.sendForgotPasswordOtp(email);
   }
 
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string; password: string }) {
+    const { email, password } = body;
+
+    // Manual validation
+    if (!email || !email.includes('@')) {
+      throw new BadRequestException('A valid email is required');
+    }
+    console.log(password);
+    if (!password || password.length < 8) {
+      throw new BadRequestException(
+        'New password must be at least 8 characters',
+      );
+    }
+
+    return this.authService.resetPassword(email, password);
+  }
+
   @Get('status')
   @UseGuards(JwtAuthGuard)
   async status(@Req() req: any) {

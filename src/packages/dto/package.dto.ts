@@ -1,5 +1,20 @@
-// src/packages/dto/create-package.dto.ts
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+// src/packages/dto/package.dto.ts
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+class ServiceDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  icon: string;
+}
 
 export class CreatePackageDto {
   @IsNotEmpty()
@@ -13,4 +28,9 @@ export class CreatePackageDto {
   @IsNotEmpty()
   @IsNumber()
   numberOfWashes: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ServiceDto)
+  services: ServiceDto[];
 }

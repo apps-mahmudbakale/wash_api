@@ -1,42 +1,25 @@
 // src/packages/packages.controller.ts
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Put,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { PackagesService } from './packages.service';
 import { CreatePackageDto } from './dto/package.dto';
+import { Package } from '../entities/package.entity';
 
 @Controller('packages')
 export class PackagesController {
   constructor(private readonly packagesService: PackagesService) {}
 
   @Post()
-  create(@Body() createPackageDto: CreatePackageDto) {
+  createPackage(@Body() createPackageDto: CreatePackageDto): Promise<Package> {
     return this.packagesService.createPackage(createPackageDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Package[]> {
     return this.packagesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<Package> {
     return this.packagesService.findOne(id);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: number, @Body() updateData: Partial<CreatePackageDto>) {
-    return this.packagesService.updatePackage(id, updateData);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.packagesService.removePackage(id);
   }
 }

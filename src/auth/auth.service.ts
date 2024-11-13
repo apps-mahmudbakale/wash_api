@@ -127,8 +127,7 @@ export class AuthService {
 
     // Check if the OTP matches and hasn't expired
     // const currentTime = new Date();
-    // @ts-ignore
-    if (user.otp !== otp ) {
+    if (user.otp !== otp) {
       throw new BadRequestException('Invalid or expired OTP');
     }
 
@@ -148,7 +147,7 @@ export class AuthService {
   async verifyOtp2(
     email: string,
     otp: string,
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; token: string }> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -160,14 +159,22 @@ export class AuthService {
     if (user.otp !== otp) {
       throw new BadRequestException('Invalid or expired OTP');
     }
-    //
+
+    // OTP is valid, generate JWT token
+    const payload = { id: user.id, name: user.name, email: user.email };
+    const token = this.jwtService.sign(payload);
+
     // OTP is valid, clear OTP and expiration once verified
     user.otp = null;
     // user.otpExpires = null;
     await this.userRepository.save(user);
     //
     // // Return success status for frontend verification
-    return { success: false, message: 'OTP verified successfully' };
+    return {
+      success: true,
+      message: 'OTP verified successfully',
+      token: token,
+    };
   }
 
   // Validate user login (via email/password)
@@ -262,5 +269,24 @@ export class AuthService {
     await this.sendOtpEmail(user.email, otp);
 
     return { message: 'OTP sent successfully' };
+  }
+  // Verify OTP and Reset Password
+  async resetPassword(
+    email: string,
+    newPassword: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await this.userRepository.save(user);
+
+    return { success: true, message: 'Password reset successfully' };
   }
 }
