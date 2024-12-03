@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import { Subscription } from './subscription.entity'
+import { Payment } from './payment.entity'
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -33,4 +35,10 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   address: string;
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 }

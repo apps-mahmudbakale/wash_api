@@ -8,59 +8,44 @@ import { CreateCarWasherDto } from './dto/create-car-washer.dto';
 export class CarWashersService {
   constructor(
     @InjectRepository(CarWashers)
-    private carWasherRepository: Repository<CarWashers>,
+    private carWashersRepository: Repository<CarWashers>,
   ) {}
 
-  // Modified method to handle profile picture upload
   async createCarWasher(
     createCarWasherDto: CreateCarWasherDto,
-    profilePicture: Express.Multer.File,
+    files: Express.Multer.File[],
   ): Promise<CarWashers> {
-    const carWasher = this.carWasherRepository.create(createCarWasherDto);
+    const carWasher = this.carWashersRepository.create(createCarWasherDto);
 
-    // Assign the profile picture file path if it exists
-    if (profilePicture) {
-      carWasher.profilePicture = `/uploads/profile-pictures/${profilePicture.filename}`;
-    }
+    // Assign file paths
+    files.forEach((file) => {
+      if (file.fieldname === 'passportPhoto') {
+        carWasher.passportPhotoFilename = `/uploads/passport-photos/${file.filename}`;
+      } else if (file.fieldname === 'idDocument') {
+        carWasher.idDocumentFilename = `/uploads/id-documents/${file.filename}`;
+      }
+    });
 
-    return this.carWasherRepository.save(carWasher);
+    return this.carWashersRepository.save(carWasher);
   }
 
   findAll(): Promise<CarWashers[]> {
-    return this.carWasherRepository.find();
+    return this.carWashersRepository.find();
   }
 
   findOne(id: number): Promise<CarWashers> {
-    return this.carWasherRepository.findOneBy({ id });
+    return this.carWashersRepository.findOneBy({ id });
   }
 
   async updateCarWasher(
     id: number,
     updateData: Partial<CreateCarWasherDto>,
   ): Promise<CarWashers> {
-    await this.carWasherRepository.update(id, updateData);
+    await this.carWashersRepository.update(id, updateData);
     return this.findOne(id);
   }
 
   async removeCarWasher(id: number): Promise<void> {
-    await this.carWasherRepository.delete(id);
-  }
-
-  async verifyKYC(id: number): Promise<CarWashers> {
-    await this.carWasherRepository.update(id, { isKYCVerified: true });
-    return this.findOne(id);
-  }
-
-  // KYC document upload handling (optional)
-  async uploadKYCDocument(
-    carWasherId: number,
-    kycDocument: Express.Multer.File,
-  ): Promise<CarWashers> {
-    const carWasher = await this.findOne(carWasherId);
-    if (carWasher) {
-      carWasher.kycDocument = `/uploads/kyc-documents/${kycDocument.filename}`;
-      return this.carWasherRepository.save(carWasher);
-    }
-    throw new Error('Car washer not found');
+    await this.carWashersRepository.delete(id);
   }
 }

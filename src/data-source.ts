@@ -6,6 +6,8 @@ import { Package } from './entities/package.entity';
 import { GiftCard } from './entities/gift-card.entity';
 import { Service } from './entities/service.entity';
 import { Rating } from './entities/rating.entity';
+import { Subscription } from './entities/subscription.entity';
+import { Payment } from './entities/payment.entity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -17,7 +19,16 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [User, CarWashers, Package, GiftCard, Rating, Service],
+  entities: [
+    User,
+    CarWashers,
+    Package,
+    GiftCard,
+    Rating,
+    Service,
+    Subscription,
+    Payment,
+  ],
   migrations: ['src/migrations/*.ts'],
   synchronize: true, // Be cautious with this in production
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false, // Add SSL configuration here

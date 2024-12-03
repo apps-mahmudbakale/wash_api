@@ -13,6 +13,9 @@ import { GiftCard } from './entities/gift-card.entity';
 import { RatingsModule } from './ratings/ratings.module';
 import { Rating } from './entities/rating.entity';
 import { Service } from './entities/service.entity';
+import { SubscriptionModule } from './subscription/subscription.module';
+import { Payment } from './entities/payment.entity';
+import { Subscription } from './entities/subscription.entity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,7 +29,16 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, CarWashers, Package, GiftCard, Rating, Service],
+      entities: [
+        User,
+        CarWashers,
+        Package,
+        GiftCard,
+        Rating,
+        Service,
+        Payment,
+        Subscription,
+      ],
       synchronize: true,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
@@ -35,6 +47,7 @@ dotenv.config();
     PackagesModule,
     GiftCardModule,
     RatingsModule,
+    SubscriptionModule,
   ],
 })
 export class AppModule {}

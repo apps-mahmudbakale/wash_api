@@ -1,22 +1,48 @@
+import { IsNotEmpty, IsEmail, IsNumber } from 'class-validator';
+
 export class CreateCarWasherDto {
+  @IsNotEmpty()
   fullName: string;
+
+  @IsNotEmpty()
+  address: string;
+
+  @IsNotEmpty()
   phone: string;
+
+  @IsEmail()
   email: string;
-  profilePicture: string; // Profile picture upload
 
-  bvn: string; // Bank Verification Number
+  @IsNotEmpty()
+  idDocumentType: string;
 
-  nin: string; // National Identification Number
+  @IsNotEmpty()
+  idDocumentFilename: string;
 
-  bankName: string;
+  @IsNotEmpty()
+  passportPhotoFilename: string;
 
-  bankAccountNumber: string;
-
-  kycDocument: string; // Path to the uploaded KYC document
-
-  isKYCVerified: boolean;
-  isActive: boolean;
-
+  @IsNumber()
   latitude: number;
+
+  @IsNumber()
   longitude: number;
+
+  @IsNotEmpty()
+  guarantor1Name: string;
+
+  @IsNotEmpty()
+  guarantor1Phone: string;
+
+  @IsNotEmpty()
+  guarantor1Address: string;
+
+  @IsNotEmpty()
+  guarantor2Name: string;
+
+  @IsNotEmpty()
+  guarantor2Phone: string;
+
+  @IsNotEmpty()
+  guarantor2Address: string;
 }

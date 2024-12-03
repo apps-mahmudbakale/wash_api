@@ -9,31 +9,44 @@ export class CarWashers {
   fullName: string;
 
   @Column()
+  address: string;
+
+  @Column()
   phone: string;
 
   @Column()
-  bankName: string;
+  email: string;
 
   @Column()
-  accountNumber: string;
+  idDocumentType: string; // Stores the identifier (e.g., NIN number)
 
-  @Column({ nullable: true })
-  bvn?: string;
+  @Column()
+  idDocumentFilename: string; // Stores the filename of the uploaded ID document
 
-  @Column({ nullable: true })
-  nin?: string;
+  @Column()
+  passportPhotoFilename: string; // Stores the filename of the passport photograph
 
-  @Column({ default: false })
-  isKYCVerified: boolean;
-
-  @Column({ nullable: true })
-  profilePicture?: string;
-
-  @Column({ nullable: true })
-  kycDocument?: string;
   @Column('decimal', { precision: 10, scale: 8 }) // Adjust precision/scale as needed
   latitude: number;
 
   @Column('decimal', { precision: 11, scale: 8 }) // Adjust precision/scale as needed
   longitude: number;
+
+  @Column()
+  guarantor1Name: string;
+
+  @Column()
+  guarantor1Phone: string;
+
+  @Column()
+  guarantor1Address: string;
+
+  @Column()
+  guarantor2Name: string;
+
+  @Column()
+  guarantor2Phone: string;
+
+  @Column()
+  guarantor2Address: string;
 }

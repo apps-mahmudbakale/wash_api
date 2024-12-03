@@ -18,7 +18,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalGuard)
   login(@Body() authPayload: AuthPayloadDto) {
-    console.log(authPayload);
+    // console.log(authPayload);
     return this.authService.validateUser(authPayload);
   }
 
