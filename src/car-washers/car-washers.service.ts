@@ -11,32 +11,33 @@ export class CarWashersService {
     private carWashersRepository: Repository<CarWashers>,
   ) {}
 
+  /**
+   * Create a new car washer with uploaded file paths.
+   */
   async createCarWasher(
     createCarWasherDto: CreateCarWasherDto,
-    files: Express.Multer.File[],
   ): Promise<CarWashers> {
     const carWasher = this.carWashersRepository.create(createCarWasherDto);
-
-    // Assign file paths
-    files.forEach((file) => {
-      if (file.fieldname === 'passportPhoto') {
-        carWasher.passportPhotoFilename = `/uploads/passport-photos/${file.filename}`;
-      } else if (file.fieldname === 'idDocument') {
-        carWasher.idDocumentFilename = `/uploads/id-documents/${file.filename}`;
-      }
-    });
-
     return this.carWashersRepository.save(carWasher);
   }
 
+  /**
+   * Retrieve all car washers.
+   */
   findAll(): Promise<CarWashers[]> {
     return this.carWashersRepository.find();
   }
 
+  /**
+   * Retrieve a single car washer by ID.
+   */
   findOne(id: number): Promise<CarWashers> {
     return this.carWashersRepository.findOneBy({ id });
   }
 
+  /**
+   * Update an existing car washer.
+   */
   async updateCarWasher(
     id: number,
     updateData: Partial<CreateCarWasherDto>,
@@ -45,6 +46,9 @@ export class CarWashersService {
     return this.findOne(id);
   }
 
+  /**
+   * Delete a car washer by ID.
+   */
   async removeCarWasher(id: number): Promise<void> {
     await this.carWashersRepository.delete(id);
   }

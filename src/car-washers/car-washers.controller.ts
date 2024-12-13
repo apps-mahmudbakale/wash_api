@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CarWashersService } from './car-washers.service';
 import { CreateCarWasherDto } from './dto/create-car-washer.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
 @Controller('car-washers')
@@ -20,38 +20,35 @@ export class CarWashersController {
 
   @Post('create')
   @UseInterceptors(
-    FilesInterceptor('files', 2, {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const folder =
-            file.fieldname === 'passportPhoto'
-              ? './uploads/passport-photos'
-              : './uploads/id-documents';
-          cb(null, folder);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(
-            null,
-            `${file.fieldname}-${uniqueSuffix}.${file.mimetype.split('/')[1]}`,
-          );
-        },
-      }),
-    }),
+    FileFieldsInterceptor([
+      { name: 'passportPhotoFilename', maxCount: 1 },
+      { name: 'idDocumentFilename', maxCount: 1 },
+    ]),
   )
   async create(
     @Body() createCarWasherDto: CreateCarWasherDto,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles()
+    files: {
+      passportPhotoFilename?: Express.Multer.File[];
+      idDocumentFilename?: Express.Multer.File[];
+    },
   ) {
-    const washer = await this.carWashersService.createCarWasher(
-      createCarWasherDto,
-      files,
-    );
-    return {
-      message: 'Car washer created successfully',
-      washer,
-    };
+    // Convert files to Base64
+    const passportPhotoBase64 = files?.passportPhotoFilename?.[0]?.buffer
+      ? files.passportPhotoFilename[0].buffer.toString('base64')
+      : null;
+
+    const idDocumentBase64 = files?.idDocumentFilename?.[0]?.buffer
+      ? files.idDocumentFilename[0].buffer.toString('base64')
+      : null;
+
+    // Add Base64 data to DTO
+    createCarWasherDto.passportPhotoFilename = passportPhotoBase64;
+    createCarWasherDto.idDocumentFilename = idDocumentBase64;
+
+    const washer =
+      await this.carWashersService.createCarWasher(createCarWasherDto);
+    return { message: 'Car washer created successfully', washer };
   }
 
   @Get()

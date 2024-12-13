@@ -20,11 +20,11 @@ export class CarWashers {
   @Column()
   idDocumentType: string; // Stores the identifier (e.g., NIN number)
 
-  @Column()
-  idDocumentFilename: string; // Stores the filename of the uploaded ID document
+  @Column('text') // Changed from string to text for Base64 data
+  idDocumentFilename: string; // Stores the Base64 string of the ID document
 
-  @Column()
-  passportPhotoFilename: string; // Stores the filename of the passport photograph
+  @Column('text') // Changed from string to text for Base64 data
+  passportPhotoFilename: string; // Stores the Base64 string of the passport photo
 
   @Column('decimal', { precision: 10, scale: 8 }) // Adjust precision/scale as needed
   latitude: number;
@@ -49,4 +49,10 @@ export class CarWashers {
 
   @Column()
   guarantor2Address: string;
+
+  @Column() // New column for bank name
+  bankName: string;
+
+  @Column() // New column for account number
+  accountNumber: string;
 }

@@ -16,6 +16,12 @@ import { Service } from './entities/service.entity';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { Payment } from './entities/payment.entity';
 import { Subscription } from './entities/subscription.entity';
+import { CarsModule } from './cars/cars.module';
+import { PoliciesModule } from './policies/policies.module';
+import { FaqsModule } from './faqs/faqs.module';
+import { Car } from './entities/car.entity';
+import { WashingModule } from './washing/washing.module';
+import { Washing } from './entities/washing.entity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -38,6 +44,8 @@ dotenv.config();
         Service,
         Payment,
         Subscription,
+        Car,
+        Washing,
       ],
       synchronize: true,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -48,6 +56,10 @@ dotenv.config();
     GiftCardModule,
     RatingsModule,
     SubscriptionModule,
+    CarsModule,
+    PoliciesModule,
+    FaqsModule,
+    WashingModule,
   ],
 })
 export class AppModule {}

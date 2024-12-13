@@ -11,6 +11,9 @@ export class GiftCard {
   @Column('decimal')
   price: number;
 
-  @Column({ type: 'text' })
-  benefits: string;
+  @Column()
+  percentage: number;
+
+  @Column()
+  couponCode: string;
 }

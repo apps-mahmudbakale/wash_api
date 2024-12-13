@@ -54,7 +54,10 @@ export class AuthService {
   }
 
   async findById(id: number): Promise<User> {
-    return await this.userRepository.findOne({ where: { id } });
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['subscriptions', 'subscriptions.package', 'cars'],
+    });
   }
 
   // User signup with OTP
@@ -68,6 +71,7 @@ export class AuthService {
       where: { email },
     });
     if (existingUser) {
+      console.log(existingUser);
       throw new ConflictException('Email already exists');
     }
 
@@ -84,8 +88,9 @@ export class AuthService {
       otp,
     });
 
+    console.log(newUser);
     // Save the user to the database
-    await this.userRepository.save(newUser);
+    // await this.userRepository.save(newUser);
 
     // Send OTP email
     await this.sendOtpEmail(email, otp);

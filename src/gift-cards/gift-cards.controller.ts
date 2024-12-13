@@ -8,7 +8,7 @@ export class GiftCardController {
 
   // POST /gift-cards - Create a new gift card
   @Post()
-  async createGiftCard(@Body() data: { name: string; price: number; benefits: string }): Promise<GiftCard> {
+  async createGiftCard(@Body() data: { name: string; price: number; percentage: number }): Promise<GiftCard> {
     return this.giftCardService.createGiftCard(data);
   }
 

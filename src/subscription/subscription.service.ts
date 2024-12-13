@@ -5,6 +5,7 @@ import { Subscription } from '../entities/subscription.entity';
 import { Payment } from '../entities/payment.entity';
 import { User } from '../entities/user.entity';
 import { Package } from '../entities/package.entity';
+import { Car } from '../entities/car.entity';
 import axios from 'axios';
 
 @Injectable()
@@ -21,6 +22,8 @@ export class SubscriptionService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Package)
     private readonly packageRepository: Repository<Package>,
+    @InjectRepository(Car)
+    private readonly carRepository: Repository<Car>,
   ) {}
 
   // Verify Paystack payment
@@ -48,11 +51,12 @@ export class SubscriptionService {
     }
   }
 
-  // Subscribe a user to a package and save payment details
+  // Subscribe a user to a package and save payment details along with plate numbers
   async subscribeUser(
     userId: number,
     packageId: number,
     paymentReference: string,
+    plateNumbers: string[],
   ): Promise<Subscription> {
     // Verify payment reference
     const paymentDetails = await this.verifyPayment(paymentReference);
@@ -71,8 +75,30 @@ export class SubscriptionService {
     });
     await this.paymentRepository.save(payment);
 
+    // Save plate numbers
+    for (const plateNumber of plateNumbers) {
+      const existingCar = await this.carRepository.findOne({
+        where: { plateNumber },
+      });
+
+      if (!existingCar) {
+        const car = this.carRepository.create({
+          plateNumber,
+          user: { id: userId },
+        });
+        await this.carRepository.save(car);
+      } else if (existingCar.user.id !== userId) {
+        throw new HttpException(
+          `Plate number ${plateNumber} is already registered to another user.`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
     // Retrieve package details
-    const packageEntity = await this.packageRepository.findOne({ where: { id: packageId } });
+    const packageEntity = await this.packageRepository.findOne({
+      where: { id: packageId },
+    });
     if (!packageEntity) {
       throw new HttpException('Invalid package', HttpStatus.NOT_FOUND);
     }
@@ -82,15 +108,15 @@ export class SubscriptionService {
     const endDate = new Date();
     endDate.setMonth(startDate.getMonth() + 1);
 
-    // Create and save subscription
-    const subscription = this.subscriptionRepository.create({
-      user: { id: userId },
-      package: { id: packageId },
-      startDate,
-      endDate,
-      status: 'ACTIVE',
+    const subscription = new Subscription();
+    subscription.user = await this.userRepository.findOne({
+      where: { id: userId },
     });
+    subscription.package = packageEntity;
+    subscription.startDate = startDate;
+    subscription.endDate = endDate;
+    subscription.status = 'ACTIVE';
 
-    return this.subscriptionRepository.save(subscription);
+    return await this.subscriptionRepository.save(subscription);
   }
 }

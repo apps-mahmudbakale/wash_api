@@ -1,6 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
-import { Subscription } from './subscription.entity'
-import { Payment } from './payment.entity'
+import { Subscription } from './subscription.entity';
+import { Payment } from './payment.entity';
+import { Car } from './car.entity';
+import { Washing } from './washing.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -41,4 +44,9 @@ export class User {
 
   @OneToMany(() => Payment, (payment) => payment.user)
   payments: Payment[];
+
+  @OneToMany(() => Car, (car) => car.user)
+  cars: Car[];
+  @OneToMany(() => Washing, (washing) => washing.user)
+  washings: Washing[];
 }
