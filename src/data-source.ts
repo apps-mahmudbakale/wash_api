@@ -8,6 +8,8 @@ import { Service } from './entities/service.entity';
 import { Rating } from './entities/rating.entity';
 import { Subscription } from './entities/subscription.entity';
 import { Payment } from './entities/payment.entity';
+import { Car } from "./entities/car.entity";
+import { Washing } from "./entities/washing.entity";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -28,6 +30,8 @@ export const AppDataSource = new DataSource({
     Service,
     Subscription,
     Payment,
+    Car,
+    Washing,
   ],
   migrations: ['src/migrations/*.ts'],
   synchronize: true, // Be cautious with this in production

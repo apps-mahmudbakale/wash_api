@@ -4,28 +4,27 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Car } from './car.entity';
+import { CarWashers } from './car-washers.entity';
 
-@Entity()
+@Entity('washings')
 export class Washing {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.washings, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.washings, { eager: true })
   user: User;
 
-  @ManyToOne(() => Car, (car) => car.washings, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Car, (car) => car.washings, { eager: true })
   car: Car;
 
-  @Column({ nullable: true })
-  washerId: number;
+  @ManyToOne(() => CarWashers, (washer) => washer.washings, { eager: true })
+  washer: CarWashers;
 
-  @CreateDateColumn()
-  requestedAt: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp' })
   scheduledAt: Date;
 
   @Column({
@@ -34,4 +33,10 @@ export class Washing {
     default: 'PENDING',
   })
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

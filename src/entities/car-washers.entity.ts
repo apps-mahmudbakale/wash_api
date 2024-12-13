@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Washing } from './washing.entity';
 
 @Entity()
 export class CarWashers {
@@ -55,4 +56,10 @@ export class CarWashers {
 
   @Column() // New column for account number
   accountNumber: string;
+
+  @Column({ default: true })
+  isAvailable: boolean;
+
+  @OneToMany(() => Washing, (washing) => washing.washer)
+  washings: Washing[];
 }
