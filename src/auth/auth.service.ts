@@ -90,7 +90,7 @@ export class AuthService {
 
     console.log(newUser);
     // Save the user to the database
-    // await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
 
     // Send OTP email
     await this.sendOtpEmail(email, otp);
