@@ -22,6 +22,7 @@ import { FaqsModule } from './faqs/faqs.module';
 import { Car } from './entities/car.entity';
 import { WashingModule } from './washing/washing.module';
 import { Washing } from './entities/washing.entity';
+import { SupportModule } from './support/support.module';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -61,6 +62,7 @@ dotenv.config();
     PoliciesModule,
     FaqsModule,
     WashingModule,
+    SupportModule,
   ],
 })
 export class AppModule {}

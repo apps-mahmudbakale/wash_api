@@ -8,6 +8,7 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { WashingService } from './washing.service';
 
@@ -17,11 +18,18 @@ export class WashingController {
 
   @Post('schedule')
   @HttpCode(HttpStatus.CREATED)
-  async createWashing(@Body() body: any) {
-    const { userId, carIds, scheduledAt } = body; // Accept carIds as an array
-    return this.washingService.createWashingRequest(
+  async scheduleWash(@Body() body: any) {
+    const { userId, cars, scheduledAt } = body;
+
+    // Validate that 'cars' is an array
+    if (!Array.isArray(cars)) {
+      throw new HttpException('Cars must be an array', HttpStatus.BAD_REQUEST);
+    }
+
+    // Pass the userId, cars, and scheduledAt to the service
+    return this.washingService.scheduleWash(
       userId,
-      carIds,
+      cars,
       new Date(scheduledAt),
     );
   }

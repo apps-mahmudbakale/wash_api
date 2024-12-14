@@ -19,46 +19,61 @@ export class WashingService {
     private readonly carWasherRepository: Repository<CarWashers>,
   ) {}
 
-  async createWashingRequest(
-    userId: number,
-    carIds: number[],
-    scheduledAt: Date,
-  ): Promise<Washing[]> {
+  // Schedule wash for multiple cars based on car names
+  async scheduleWash(userId: number, cars: string[], scheduledAt: Date) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const cars = await this.carRepository.find({
-      where: { id: In(carIds) },
+    // Find an available washer
+    const washer = await this.carWasherRepository.findOne({
+      where: { isAvailable: true },
     });
-
-    if (cars.length !== carIds.length) {
-      throw new NotFoundException('One or more cars not found');
-    }
-
-    const washer = await this.carWasherRepository.findOne({ where: { isAvailable: true } });
-
     if (!washer) {
-      throw new NotFoundException('No available washer found');
+      throw new NotFoundException('No available washers at the moment');
     }
 
-    // Mark washer as unavailable
-    washer.isAvailable = false;
-    await this.carWasherRepository.save(washer);
+    const carIds: number[] = [];
 
-    // Create a washing record for each car
-    const washings = cars.map((car) =>
-      this.washingRepository.create({
+    // Get car IDs based on car names
+    for (const carName of cars) {
+      const car = await this.carRepository.findOne({
+        where: { plateNumber: carName },
+      });
+      if (!car) {
+        throw new NotFoundException(`Car with name ${carName} not found`);
+      }
+      carIds.push(car.id);
+    }
+
+    // Create washing requests for each car
+    for (const carId of carIds) {
+      const car = await this.carRepository.findOne({ where: { id: carId } });
+      const washingRequest = this.washingRepository.create({
         user,
         car,
         washer,
         scheduledAt,
-      }),
-    );
+        status: 'PENDING', // Default status
+      });
+      await this.washingRepository.save(washingRequest);
+    }
 
-    return this.washingRepository.save(washings);
+    // Update washer availability
+    washer.isAvailable = false;
+    await this.carWasherRepository.save(washer);
+
+    // Return washer details
+    return {
+      message: 'Washes scheduled successfully',
+      washer: {
+        id: washer.id,
+        name: washer.fullName,
+        phone: washer.phone,
+        photo: washer.passportPhotoFilename,
+      },
+    };
   }
 
   async getAllWashings(): Promise<Washing[]> {
