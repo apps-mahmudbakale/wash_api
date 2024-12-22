@@ -60,9 +60,24 @@ export class WashingService {
       await this.washingRepository.save(washingRequest);
     }
 
-    // Update washer availability
-    washer.isAvailable = false;
-    await this.carWasherRepository.save(washer);
+    // Count the number of wash requests for this washer on the given day
+    const startOfDay = new Date(scheduledAt);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(scheduledAt);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dailyWashCount = await this.washingRepository.count({
+      where: {
+        washer: { id: washer.id },
+        scheduledAt: In([startOfDay, endOfDay]),
+      },
+    });
+
+    // Update washer availability if they have more than 10 wash requests for the day
+    if (dailyWashCount > 10) {
+      washer.isAvailable = false;
+      await this.carWasherRepository.save(washer);
+    }
 
     // Return washer details
     return {
@@ -86,6 +101,36 @@ export class WashingService {
       throw new NotFoundException('Washing not found');
     }
     return washing;
+  }
+
+  async getWashingsByWasherId(washerId: number) {
+    const washings = await this.washingRepository.find({
+      where: {
+        washer: { id: washerId },
+        status: 'PENDING', // Filter by status 'PENDING'
+      },
+      relations: ['user', 'car'], // Include related entities if needed
+    });
+
+    if (!washings.length) {
+      throw new NotFoundException(
+        'No pending washings found for the specified washer',
+      );
+    }
+
+    return washings.map((washing) => ({
+      id: washing.id,
+      user: {
+        id: washing.user.id,
+        name: washing.user.name,
+      },
+      car: {
+        id: washing.car.id,
+        plateNumber: washing.car.plateNumber,
+      },
+      scheduledAt: washing.scheduledAt,
+      status: washing.status,
+    }));
   }
 
   async updateWashingStatus(

@@ -5,6 +5,7 @@ import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { SignupDto } from './dto/signup.dto';
+import { CreateCarWasherDto } from '../car-washers/dto/create-car-washer.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -110,5 +111,25 @@ export class AuthController {
     @Body('password') password: string,
   ) {
     return await this.authService.adminLogin(email, password);
+  }
+  @Post('washer/signup')
+  async washerSignup(@Body() createCarWasherDto: CreateCarWasherDto) {
+    return this.authService.washerSignup(createCarWasherDto);
+  }
+
+  @Post('washer/login')
+  async washerLogin(@Body() payload: AuthPayloadDto) {
+    const { email, password } = payload;
+    return this.authService.washerLogin(email, password);
+  }
+  @Post('verify-otp-washer')
+  async verifyOtpWasher(
+    @Body('email') email: string,
+    @Body('otp') otp: string,
+  ) {
+    if (!email || !otp) {
+      throw new BadRequestException('Email and OTP are required');
+    }
+    return this.authService.verifyOtpWasher(email, otp);
   }
 }

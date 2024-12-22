@@ -43,6 +43,10 @@ export class WashingController {
   async getWashingById(@Param('id') id: number) {
     return this.washingService.getWashingById(id);
   }
+  @Get('washer/:washerId')
+  async getWashingsByWasherId(@Param('washerId') washerId: number) {
+    return this.washingService.getWashingsByWasherId(washerId);
+  }
 
   @Patch(':id/status')
   async updateWashingStatus(@Param('id') id: number, @Body() body: any) {

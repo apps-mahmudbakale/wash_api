@@ -9,7 +9,7 @@ export class CarWashers {
   @Column()
   fullName: string;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
   @Column()
@@ -18,43 +18,49 @@ export class CarWashers {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
+  password: string;
+
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true })
   idDocumentType: string; // Stores the identifier (e.g., NIN number)
 
-  @Column('text') // Changed from string to text for Base64 data
+  @Column({ type: 'text', nullable: true }) // Changed from string to text for Base64 data
   idDocumentFilename: string; // Stores the Base64 string of the ID document
 
-  @Column('text') // Changed from string to text for Base64 data
+  @Column({ type: 'text', nullable: true }) // Changed from string to text for Base64 data
   passportPhotoFilename: string; // Stores the Base64 string of the passport photo
 
-  @Column('decimal', { precision: 10, scale: 8 }) // Adjust precision/scale as needed
+  @Column({ type: 'decimal', nullable: true}) // Adjust precision/scale as needed
   latitude: number;
 
-  @Column('decimal', { precision: 11, scale: 8 }) // Adjust precision/scale as needed
+  @Column({ type: 'decimal', nullable: true }) // Adjust precision/scale as needed
   longitude: number;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor1Name: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor1Phone: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor1Address: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor2Name: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor2Phone: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   guarantor2Address: string;
 
-  @Column() // New column for bank name
+  @Column({ type: 'text', nullable: true }) // New column for bank name
   bankName: string;
 
-  @Column() // New column for account number
+  @Column({ type: 'text', nullable: true }) // New column for account number
   accountNumber: string;
 
   @Column({ default: true })

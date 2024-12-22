@@ -1,10 +1,11 @@
-import { IsNotEmpty, IsEmail, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsEmail, IsNumber, IsEmpty } from 'class-validator';
+
 
 export class CreateCarWasherDto {
   @IsNotEmpty()
   fullName: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   address: string;
 
   @IsNotEmpty()
@@ -14,12 +15,15 @@ export class CreateCarWasherDto {
   email: string;
 
   @IsNotEmpty()
+  password: string;
+
+  @IsEmpty()
   idDocumentType: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   idDocumentFilename: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   passportPhotoFilename: string;
 
   @IsNumber()
@@ -28,21 +32,21 @@ export class CreateCarWasherDto {
   @IsNumber()
   longitude: number;
 
-  @IsNotEmpty()
+  @IsEmpty()
   guarantor1Name: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   guarantor1Phone: string;
 
   @IsNotEmpty()
   guarantor1Address: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   guarantor2Name: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   guarantor2Phone: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   guarantor2Address: string;
 }

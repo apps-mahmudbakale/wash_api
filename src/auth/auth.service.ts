@@ -13,7 +13,9 @@ import { AuthPayloadDto } from './dto/auth.dto';
 import { SignupDto } from './dto/signup.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import * as nodemailer from 'nodemailer'; // Still using nodemailer here
+import * as nodemailer from 'nodemailer';
+import { CarWashers } from '../entities/car-washers.entity';
+import { CreateCarWasherDto } from '../car-washers/dto/create-car-washer.dto'; // Still using nodemailer here
 
 @Injectable()
 export class AuthService {
@@ -21,6 +23,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(CarWashers)
+    private readonly carWasherRepository: Repository<CarWashers>,
   ) {}
 
   // Helper to generate OTP and its expiration time
@@ -235,10 +239,10 @@ export class AuthService {
   ): Promise<{ token: string }> {
     const user = await this.userRepository.findOne({ where: { email } });
 
-    console.log(user);
-    // if (!user || user.role !== 'admin') {
-    //   throw new ForbiddenException('Access denied');
-    // }
+    // console.log(user);
+    if (!user || user.role !== 'admin') {
+      throw new ForbiddenException('Access denied');
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -293,5 +297,100 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return { success: true, message: 'Password reset successfully' };
+  }
+  async washerSignup(createCarWasherDto: CreateCarWasherDto): Promise<{
+    id: number;
+    fullName: string;
+    email: string;
+    password: string;
+    phone: string;
+  }> {
+    const { fullName, email, password, phone } = createCarWasherDto;
+
+    const existingWasher = await this.carWasherRepository.findOne({
+      where: { email },
+    });
+    if (existingWasher) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const { otp } = this.generateOtp();
+    const newWasher = this.carWasherRepository.create({
+      fullName,
+      email,
+      phone,
+      password: hashedPassword,
+      otp,
+    });
+    await this.carWasherRepository.save(newWasher);
+
+    await this.sendOtpEmail(email, otp);
+    return {
+      id: newWasher.id,
+      fullName: newWasher.fullName,
+      email: newWasher.email,
+      phone: newWasher.phone,
+      password: newWasher.password,
+    };
+  }
+
+  /**
+   * Washer Login
+   */
+  async washerLogin(
+    email: string,
+    password: string,
+  ): Promise<{ token: string }> {
+    const washer = await this.carWasherRepository.findOne({ where: { email } });
+    if (!washer) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, washer.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = {
+      id: washer.id,
+      name: washer.fullName,
+      email: washer.email,
+    };
+    const token = this.jwtService.sign(payload);
+
+    return { token };
+  }
+  /**
+   * Verify OTP
+   */
+  async verifyOtpWasher(
+    email: string,
+    otp: string,
+  ): Promise<{ success: boolean; message: string; token: any }> {
+    const washer = await this.carWasherRepository.findOne({ where: { email } });
+    if (!washer) {
+      throw new NotFoundException('Account not found');
+    }
+    if (washer.otp !== otp) {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    washer.otp = null; // Clear OTP after successful verification
+    await this.carWasherRepository.save(washer);
+
+    const payload = {
+      id: washer.id,
+      name: washer.fullName,
+      email: washer.email,
+      phone: washer.phone,
+    };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      success: true,
+      message: 'OTP verified successfully',
+      token: token,
+    };
   }
 }
